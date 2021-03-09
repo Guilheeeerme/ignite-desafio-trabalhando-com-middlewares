@@ -23,7 +23,15 @@ function checksExistsUserAccount(request, response, next) {
   return next();
 }
 
-function checksCreateTodosUserAvailability(request, response, next) {}
+function checksCreateTodosUserAvailability(request, response, next) {
+  const { user } = request;
+
+  if (!((user.pro === false && user.todos.length <= 9) || user.pro === true)) {
+    return response.status(400).send();
+  }
+
+  return next();
+}
 
 function checksTodoExists(request, response, next) {
   // Complete aqui
