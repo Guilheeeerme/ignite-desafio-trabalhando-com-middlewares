@@ -26,11 +26,13 @@ function checksExistsUserAccount(request, response, next) {
 function checksCreateTodosUserAvailability(request, response, next) {
   const { user } = request;
 
-  if (!((user.pro === false && user.todos.length <= 9) || user.pro === true)) {
-    return response.status(400).send();
+  if (user.pro === false && user.todos.length >= 10) {
+    return response.status(403).json({ error: "" });
   }
 
-  return next();
+  if ((user.pro === false && user.todos.length < 10) || user.pro === true) {
+    return next();
+  }
 }
 
 function checksTodoExists(request, response, next) {
@@ -38,7 +40,6 @@ function checksTodoExists(request, response, next) {
   const { id } = request.params;
 
   const user = users.find((user) => user.username === username);
-  const todo = user.todos.find((todo) => todo.id === id);
 
   if (!user) {
     return response.status(404).json({ error: "User not found" });
@@ -47,6 +48,8 @@ function checksTodoExists(request, response, next) {
   if (!validate(id)) {
     return response.status(400).json({ error: "Invalid id" });
   }
+
+  const todo = user.todos.find((todo) => todo.id === id);
 
   if (!todo) {
     return response.status(404).json({ error: "Todo not found" });
